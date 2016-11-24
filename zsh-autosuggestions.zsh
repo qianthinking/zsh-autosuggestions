@@ -3,7 +3,7 @@
 # v0.3.3
 # Copyright (c) 2013 Thiago de Arruda
 # Copyright (c) 2016 Eric Freese
-# 
+#
 # Permission is hereby granted, free of charge, to any person
 # obtaining a copy of this software and associated documentation
 # files (the "Software"), to deal in the Software without
@@ -12,10 +12,10 @@
 # copies of the Software, and to permit persons to whom the
 # Software is furnished to do so, subject to the following
 # conditions:
-# 
+#
 # The above copyright notice and this permission notice shall be
 # included in all copies or substantial portions of the Software.
-# 
+#
 # THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
 # EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
 # OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
@@ -24,6 +24,7 @@
 # WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 # OTHER DEALINGS IN THE SOFTWARE.
+zmodload zsh/datetime
 
 #--------------------------------------------------------------------#
 # Global Configuration Variables                                     #
@@ -86,6 +87,12 @@ ZSH_AUTOSUGGEST_IGNORE_WIDGETS=(
 
 # Max size of buffer to trigger autosuggestion. Leave undefined for no upper bound.
 ZSH_AUTOSUGGEST_BUFFER_MAX_SIZE=
+# EPOCH of the last changed widget call
+ZSH_AUTOSUGGEST_LAST_MODIFY_TIME=$EPOCHREALTIME
+
+# Lower bound for the time between changes that will cause autosuggest
+# to suspend suggestions for the current edit.
+ZSH_AUTOSUGGEST_CUTOFF_PERIOD=0.02
 
 #--------------------------------------------------------------------#
 # Handle Deprecated Variables/Widgets                                #
@@ -272,6 +279,14 @@ _zsh_autosuggest_modify() {
 		POSTDISPLAY="$orig_postdisplay"
 		return $retval
 	fi
+
+    local time_passed=$(($EPOCHREALTIME - $ZSH_AUTOSUGGEST_LAST_MODIFY_TIME))
+
+    if (( $time_passed < $ZSH_AUTOSUGGEST_CUTOFF_PERIOD )); then
+        return 1
+    fi
+
+    ZSH_AUTOSUGGEST_LAST_MODIFY_TIME=$EPOCHREALTIME
 
 	# Get a new suggestion if the buffer is not empty after modification
 	local suggestion

@@ -1,3 +1,4 @@
+zmodload zsh/datetime
 
 #--------------------------------------------------------------------#
 # Global Configuration Variables                                     #
@@ -60,3 +61,9 @@ ZSH_AUTOSUGGEST_IGNORE_WIDGETS=(
 
 # Max size of buffer to trigger autosuggestion. Leave undefined for no upper bound.
 ZSH_AUTOSUGGEST_BUFFER_MAX_SIZE=
+# EPOCH of the last changed widget call
+ZSH_AUTOSUGGEST_LAST_MODIFY_TIME=$EPOCHREALTIME
+
+# Lower bound for the time between changes that will cause autosuggest
+# to suspend suggestions for the current edit.
+ZSH_AUTOSUGGEST_CUTOFF_PERIOD=0.02
